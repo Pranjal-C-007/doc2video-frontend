@@ -8,7 +8,10 @@ import LanguageModal from './components/LanguageModal';
 import CreatorPage from './pages/Creator/CreatorPage';
 import OfficerDashboardPage from './pages/OfficerDashboard/OfficerDashboardPage';
 
-const API_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_BACKEND_URL || 'http://localhost:5001';
+const rawApiUrl = (import.meta.env.VITE_API_URL || import.meta.env.VITE_BACKEND_URL || 'http://localhost:5001').trim();
+const API_URL = (rawApiUrl.startsWith('http://') || rawApiUrl.startsWith('https://'))
+  ? rawApiUrl.replace(/\/+$/, '')
+  : `https://${rawApiUrl.replace(/^\/+/, '').replace(/\/+$/, '')}`;
 
 
 
