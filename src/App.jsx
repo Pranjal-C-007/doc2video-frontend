@@ -13,7 +13,17 @@ const API_URL = (rawApiUrl.startsWith('http://') || rawApiUrl.startsWith('https:
   ? rawApiUrl.replace(/\/+$/, '')
   : `https://${rawApiUrl.replace(/^\/+/, '').replace(/\/+$/, '')}`;
 
-
+/**
+ * Ensure a video/asset URL is served over HTTPS when the page itself is HTTPS.
+ * Prevents Chrome Mixed Content errors.
+ */
+const ensureHttps = (url) => {
+  if (!url) return url;
+  if (window.location.protocol === 'https:') {
+    return url.replace(/^http:\/\//i, 'https://');
+  }
+  return url;
+};
 
 export default function App() {
   const [currentView, setCurrentView] = useState('creator'); // 'creator' | 'officer-dashboard'
@@ -97,9 +107,11 @@ export default function App() {
 
 
       if (response.data && response.data.success) {
-        // Ensure video_url is absolute
+        // Ensure video_url is absolute and served over HTTPS
         const rawUrl = response.data.video_url || '';
-        const resolvedVideoUrl = rawUrl.startsWith('http') ? rawUrl : `${API_URL}${rawUrl.startsWith('/') ? '' : '/'}${rawUrl}`;
+        const resolvedVideoUrl = ensureHttps(
+          rawUrl.startsWith('http') ? rawUrl : `${API_URL}${rawUrl.startsWith('/') ? '' : '/'}${rawUrl}`
+        );
         const finalData = { ...response.data, video_url: resolvedVideoUrl };
 
         setGeneratedVideo(finalData);
@@ -148,7 +160,9 @@ export default function App() {
 
     if (response.data && response.data.success) {
       const rawUrl = response.data.video_url || '';
-      const resolvedVideoUrl = rawUrl.startsWith('http') ? rawUrl : `${API_URL}${rawUrl.startsWith('/') ? '' : '/'}${rawUrl}`;
+      const resolvedVideoUrl = ensureHttps(
+        rawUrl.startsWith('http') ? rawUrl : `${API_URL}${rawUrl.startsWith('/') ? '' : '/'}${rawUrl}`
+      );
       const finalData = { ...response.data, video_url: resolvedVideoUrl };
 
       setGeneratedVideo(finalData);
