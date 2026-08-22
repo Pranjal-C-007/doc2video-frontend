@@ -8,10 +8,17 @@ import LanguageModal from './components/LanguageModal';
 import CreatorPage from './pages/Creator/CreatorPage';
 import OfficerDashboardPage from './pages/OfficerDashboard/OfficerDashboardPage';
 
-const rawApiUrl = (import.meta.env.VITE_API_URL || import.meta.env.VITE_BACKEND_URL || 'http://localhost:5001').trim();
-const API_URL = (rawApiUrl.startsWith('http://') || rawApiUrl.startsWith('https://'))
-  ? rawApiUrl.replace(/\/+$/, '')
-  : `https://${rawApiUrl.replace(/^\/+/, '').replace(/\/+$/, '')}`;
+// Automatically connect to local backend (http://localhost:5001) when running locally, or Railway when deployed on Vercel
+const getApiUrl = () => {
+  if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+    return 'http://localhost:5001';
+  }
+  const raw = (import.meta.env.VITE_API_URL || import.meta.env.VITE_BACKEND_URL || 'https://docs2video-backend-production.up.railway.app').trim();
+  return raw.startsWith('http') ? raw.replace(/\/+$/, '') : `https://${raw.replace(/^\/+/, '').replace(/\/+$/, '')}`;
+};
+
+const API_URL = getApiUrl();
+
 
 /**
  * Ensure a video/asset URL is served over HTTPS when the page itself is HTTPS.
